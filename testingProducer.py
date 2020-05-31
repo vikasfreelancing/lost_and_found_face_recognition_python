@@ -1,0 +1,35 @@
+from confluent_kafka import Producer
+
+
+conf = {
+        'bootstrap.servers': 'moped-01.srvs.cloudkafka.com:9094,moped-02.srvs.cloudkafka.com:9094,moped-03.srvs.cloudkafka.com:9094',
+         'session.timeout.ms': 6000,
+        'security.protocol': 'SASL_SSL',
+	   'sasl.mechanisms': 'SCRAM-SHA-256',
+        'sasl.username': "5h860wrw",
+        'sasl.password': "dJ5Wq7kkovd2V9ROJltMOqhi3K3xS38K"
+    }
+#p = Producer({'bootstrap.servers': 'moped-01.srvs.cloudkafka.com:9094,moped-02.srvs.cloudkafka.com:9094,moped-03.srvs.cloudkafka.com:9094'})
+p=Producer(**conf)
+
+def delivery_report(err, msg):
+    """ Called once for each message produced to indicate delivery result.
+        Triggered by poll() or flush(). """
+    if err is not None:
+        print('Message delivery failed: {}'.format(err))
+    else:
+        print('Message delivered to {} [{}]'.format(msg.topic(), msg.partition()))
+some_data_source=["leeeeelll"]
+for data in some_data_source:
+    
+    # Trigger any available delivery report callbacks from previous produce() calls
+    p.poll(1.0)
+
+    # Asynchronously produce a message, the delivery report callback
+    # will be triggered from poll() above, or flush() below, when the message has
+    # been successfully delivered or failed permanently.
+    p.produce('5h860wrw-found_items', data.encode('utf-8'), callback=delivery_report)
+
+# Wait for any outstanding messages to be delivered and delivery report
+# callbacks to be triggered.
+p.flush()
